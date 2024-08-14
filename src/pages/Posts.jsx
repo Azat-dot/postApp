@@ -12,6 +12,8 @@ import Loader from '../Loader/Loader.jsx';
 import { useFetching } from '../hooks/useFetching.js';
 import { getPageCount, getPagesArray } from '../utils/pages.js';
 import Pagination from '../components/UI/pagination/Pagination.jsx';
+import { useObserver } from '../hooks/useObserver.js';
+import MySelect from '../components/UI/select/MySelеct.jsx';
 
 function Posts() {
   const [posts, setPosts] = useState([]);
@@ -22,9 +24,7 @@ function Posts() {
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(1);
   const lastElement = useRef()
-  const observer = useRef()
-  console.log(lastElement);
-
+ 
   const [fetchPosts, isPostsLoading, postError] = useFetching(async () => {
     const response = await PostService.getAll(limit, page);
     setPosts([...posts, ...response.data] );
@@ -32,23 +32,11 @@ function Posts() {
     setTotalPages(getPageCount(totalCount, limit));
   });
 
-  useEffect(() => {
-    if(isPostsLoading) return;
-    if(observer.current) observer.current.disconnect();
-    var callback = function (entries, observer) {
-      if (entries[0].isIntersecting && page < totalPages){
-      console.log(page);
-      setPage(page + 1)
-      }
-    };
-    observer.current = new IntersectionObserver(callback);
-    observer.current.observe(lastElement.current)
-
-  }, [isPostsLoading] )
+  useObserver(lastElement, page < totalPages, isPostsLoading, () => {setPage(page + 1)})
 
   useEffect(() => {
     fetchPosts();
-  }, [page]);
+  }, [page, limit]);
 
   const createPost = (newPost) => {
     setPosts([...posts, newPost]);
@@ -80,6 +68,18 @@ function Posts() {
       </MyModal>
       <hr style={{ margin: '15px 0' }} />
       <PostFilter filter={filter} setFilter={setFilter} />
+      <MySelect
+      value={limit}
+      onChange={value => setLimit(value)}
+      defaultValue="Количество элементов на странице"
+      options={[
+        {value: 5, name:'5'},
+        {value: 15, name: '15'},
+        {value: 25, name: '25'},
+        {value: -1, name: 'Показать все посты'}
+      ]}
+      />
+
       {postError && <h1>Произошла ошибка ${postError}</h1>}
       <PostList
           remove={removePost}
