@@ -36,9 +36,8 @@ const PostIdPages = () => {
       <h1>
         Комментарии
       </h1>
-      {
-        isComLoading    
-            ?<Loader />
+      {isComLoading    
+            ? <Loader />
             : <div> 
               {comments.map(comm => 
                 <div style={{marginTop: 15}}>

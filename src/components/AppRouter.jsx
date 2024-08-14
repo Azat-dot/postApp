@@ -4,14 +4,21 @@ import About from '../pages/About';
 import Posts from '../pages/Posts';
 import Error from '../pages/Error';
 import PostIdPages from '../pages/PostIdPages';
-import { routes } from './router/routes';
+import { publicRoutes, privateRoutes } from './router';
 
 const AppRouter = () => {
   return (
     
       <Routes>
 
-        {routes.map(route =>
+        {privateRoutes.map(route =>
+        <Route
+          key={route.path}
+          element={<route.element/>}
+          path={route.path}
+          />
+          )}
+        {publicRoutes.map(route =>
         <Route
           key={route.path}
           element={<route.element/>}
