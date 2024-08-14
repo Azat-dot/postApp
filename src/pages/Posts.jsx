@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import PostList from '../components/PostList.jsx';
 import PostForm from '../components/PostForm.jsx';
 
@@ -21,13 +21,30 @@ function Posts() {
   const [totalPages, setTotalPages] = useState();
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(1);
+  const lastElement = useRef()
+  const observer = useRef()
+  console.log(lastElement);
 
   const [fetchPosts, isPostsLoading, postError] = useFetching(async () => {
     const response = await PostService.getAll(limit, page);
-    setPosts(response.data);
+    setPosts([...posts, ...response.data] );
     const totalCount = response.headers['x-total-count'];
     setTotalPages(getPageCount(totalCount, limit));
   });
+
+  useEffect(() => {
+    if(isPostsLoading) return;
+    if(observer.current) observer.current.disconnect();
+    var callback = function (entries, observer) {
+      if (entries[0].isIntersecting && page < totalPages){
+      console.log(page);
+      setPage(page + 1)
+      }
+    };
+    observer.current = new IntersectionObserver(callback);
+    observer.current.observe(lastElement.current)
+
+  }, [isPostsLoading] )
 
   useEffect(() => {
     fetchPosts();
@@ -64,7 +81,14 @@ function Posts() {
       <hr style={{ margin: '15px 0' }} />
       <PostFilter filter={filter} setFilter={setFilter} />
       {postError && <h1>Произошла ошибка ${postError}</h1>}
-      {isPostsLoading ? (
+      <PostList
+          remove={removePost}
+          posts={sortedAndSearchedPosts}
+          title="Список постов 1"
+        />
+      <div ref={lastElement} style={{height: 20, background: "red"}}/>
+
+      {isPostsLoading &&
         <div
           style={{
             display: 'flex',
@@ -75,13 +99,7 @@ function Posts() {
           {' '}
           <Loader />{' '}
         </div>
-      ) : (
-        <PostList
-          remove={removePost}
-          posts={sortedAndSearchedPosts}
-          title="Список постов 1"
-        />
-      )}
+       }
       <Pagination page={page} totalPages={totalPages} changePage={changePage} />
     </div>
   );
