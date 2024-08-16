@@ -7,6 +7,7 @@ const Navbar = () => {
   const {isAuth, setIsAuth} = useContext(AuthContext);
 
   const logout = () => {
+    console.log("logout");
     setIsAuth(false);
     localStorage.removeItem('auth')
   }
@@ -16,7 +17,7 @@ const Navbar = () => {
   // }
   return (
     <div className="navbar">
-      <MyButton onClick={logout}>
+      <MyButton handler={logout}>
         Выйти
       </MyButton>
         <div className="navbar__links">

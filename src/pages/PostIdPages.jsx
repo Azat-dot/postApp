@@ -7,8 +7,9 @@ import Loader from '../Loader/Loader';
 const PostIdPages = () => {
   const params = useParams();
   const [post, setPost] = useState({});
-  const [comments, getComments] = useState([]);
+  const [comments, setComments] = useState([]);
   const [fetchPostById, isLoading, error] = useFetching(async (id) => {
+    console.log('id: ' + id);
     const response = await PostService.getById(id);
     setPost(response.data);
   });
@@ -17,7 +18,6 @@ const PostIdPages = () => {
     setComments(response.data);
   });
 
-  console.log(params);
 
   useEffect(() => {
     fetchPostById(params.id);

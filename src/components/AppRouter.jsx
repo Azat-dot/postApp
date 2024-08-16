@@ -14,8 +14,6 @@ const AppRouter = () => {
     isAuth 
     ?
     <Routes>
-        isAuth 
-        ? 
         {privateRoutes.map(route =>
                 <Route
                   key={route.path}

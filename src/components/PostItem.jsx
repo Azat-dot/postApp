@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 const PostItem = (props) => {
   const navigate = useNavigate(); // аналог <Navigate/> не создает html-элемент; или <Link/> = <a/>
+  console.log(props.post.body);
   return (
     <div>
       <div className="post">
